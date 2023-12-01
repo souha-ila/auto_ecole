@@ -2,7 +2,6 @@
 
 # Laravel API Routes
 
-This repository contains a Laravel API for managing vehicules.
 
 ## API Routes
 
