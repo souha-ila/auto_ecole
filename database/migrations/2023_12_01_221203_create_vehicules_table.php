@@ -15,14 +15,14 @@ return new class extends Migration
     {
         Schema::create('vehicules', function (Blueprint $table) {
             $table->id();
-            $table->integer('modele')->nullable(false);
-            $table->string('matricule')->unique()->nullable(false);
-            $table->string('marque')->nullable(false);
-            $table->unsignedBigInteger('autoEcole_id')->nullable(false);//non negative value
-            $table->unsignedBigInteger('permis_id')->nullable(false);
+            $table->integer('modele');
+            $table->string('matricule')->unique();
+            $table->string('marque');
+            $table->unsignedBigInteger('autoEcole_id');
+            $table->unsignedBigInteger('permis_id');
             $table->timestamps();
-           
-
+            $table->softDeletes();
+            
             // Foreign key 
            // $table->foreign('autoEcole_id')->references('id')->on('autoEcoles')->onDelete('cascade');
            // $table->foreign('permis_id')->references('id')->on('permis')->onDelete('cascade');
@@ -34,8 +34,11 @@ return new class extends Migration
      *
      * @return void
      */
+    
     public function down()
     {
-        Schema::dropIfExists('_vehicules');
+        Schema::table('vehicules', function (Blueprint $table) {
+            $table->dropSoftDeletes();
+        });
     }
 };
