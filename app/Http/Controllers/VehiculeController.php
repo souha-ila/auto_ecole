@@ -1,39 +1,45 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers;
 
 use App\Models\Vehicule;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\VehiculeResource;
 use Illuminate\Support\Facades\Validator;
 
 class VehiculeController extends Controller
 {
-
-    //-------------------------List of vehicules--------------------------
-    public function index(){
-    $vehicules = Vehicule::all();
-    if ( count ($vehicules) > 0){
-        return response()->json([
-            "status" => 200,
-            "vehicules"=>$vehicules
-        ],200);
-    }else{
-        return response()->json([
-            "status"=>404,
-            "message"=>'NO Results Found'
-        ],404);
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(): JsonResponse
+    {
+        $vehicules = Vehicule::paginate();
+    
+        return ($vehicules->count() > 0)
+            ? response()->json(["data" => VehiculeResource::collection($vehicules)], 200)
+            : response()->json(["vehicules" => []], 404);
     }
-  
-    }
-//-------------------------AddVehicule-------------------------- 
-public function addVehicule(Request $request)
+    
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    //----------------------------------AddVehicule----------------------
+    public function store(Request $request)
 {
     // Validation rules
     $validator = Validator::make($request->all(), [
         'modele' => 'required|integer',
         'matricule' => 'required|unique:vehicules|string',
         'marque' => 'required|string',
+        'couleur' => 'required|string',
         'autoEcole_id' => 'required|integer',
         'permis_id' => 'required|integer',
     ]);
@@ -45,56 +51,57 @@ public function addVehicule(Request $request)
         'modele' => $request->modele,
         'matricule' => $request->matricule,
         'marque' => $request->marque,
+        'couleur' => $request->couleur,
         'autoEcole_id' => $request->autoEcole_id,
         'permis_id' => $request->permis_id,
     ]);
     if ($vehicule) {
-        return response()->json(['message' => 'Vehicule added successfully', 'data' => $vehicule], 201);
+        return response()->json(['message' => 'Vehicule added successfully', 'data' => $vehicule], 201);//return just vehicule id
     } else {
         return response()->json(['error' => 'Failed to create vehicule'], 500);
     }
 }
 
-//--------------------------------show details of vehicul--------------------
-public function Details($id)
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    //--------------------------------show details of vehicul--------------------
+    public function show($id)
     {
-        $vehicule = Vehicule::find($id);
-        if ($vehicule) {
+        try {
+            $vehicule = Vehicule::findOrFail($id);
+    
             return response()->json([
                 'status' => 'success',
                 'data' => $vehicule,
-            ],200);
-        } else {
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'the Vehicule with ID ' . $id.'  Not found',
-            ], 404); 
+                'message' => 'The Vehicule with ID ' . $id . ' Not found',
+            ], 404);
         }
     }
+    
 
-//------------------------------------Edit function------------------
-public function Edit($id)
-    {
-        $vehicule = Vehicule::find($id);
-        if ($vehicule) {
-            return response()->json([
-                'status' => 'success',
-                'data' => $vehicule,
-            ],200);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'the Vehicule with ID ' . $id.'  Not found',
-            ], 404); 
-        }
-    }
-//-------Update-----------
-public function Update(Request $request, $id)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    //-----------------------------------update vehicule---------------------
+    public function update(Request $request, $id)
     {        
         $validator = Validator::make($request->all(), [
             'modele' => 'required|integer',
             'matricule' => 'required|string|unique:vehicules,matricule,'.$id,
             'marque' => 'required|string',
+            'couleur' => 'required|string',
             'autoEcole_id' => 'required|integer',
             'permis_id' => 'required|integer',
         ]);
@@ -114,6 +121,7 @@ public function Update(Request $request, $id)
                 'modele' => $request->modele,
                 'matricule' => $request->matricule,
                 'marque' => $request->marque,
+                'couleur' => $request->couleur,
                 'autoEcole_id' => $request->autoEcole_id,
                 'permis_id' => $request->permis_id,
             ]);
@@ -129,24 +137,30 @@ public function Update(Request $request, $id)
             ], 404);
         }
     }
-//----------------------------Delete------------------------------------
-public function Delete(Request $request, $id){
-    $vehicule = Vehicule::find($id);
-    if ($vehicule) {
-        $vehicule->delete();
-        return response()->json([
-            'status'=> 'success',
-            'message'=> ' Vehicule deleted successfully',
-            ],200);
-        }
-        else {
-            return response()->json([
-                'status'=> 'error',
-                'message'=> 'Not found',
-                ],404);
-        }
 
-}
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    //--------------------------------delete vehicule---------------------
+    public function destroy(Request $request, $id)
+    {
+        try {
+            $vehicule = Vehicule::find($id);
+            if ($vehicule) {
+                $vehicule->delete();
+                return response()->json(['status' => 'success', 'message' => 'Vehicule deleted successfully'], 200);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'Not found'], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Internal Server Error'], 500);
+        }
+    }
+    
 //-----------------List of vehicles by AutoEcole ID-----------------
 public function vehiclesByAutoEcole($autoEcoleId)
 {
@@ -182,5 +196,6 @@ public function vehiclesByPermis($PermisId)
         ], 404);
     }
 }
-
 }
+
+

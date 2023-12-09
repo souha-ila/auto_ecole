@@ -20,6 +20,7 @@ class Vehicule extends Model
         'modele',
         'matricule',
         'marque',
+        'couleur',
         'autoEcole_id',
         'permis_id',
         
