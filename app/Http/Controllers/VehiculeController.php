@@ -19,11 +19,10 @@ class VehiculeController extends Controller
     public function index(): JsonResponse
     {
         $vehicules = Vehicule::paginate();
-    
-        return ($vehicules->count() > 0)
-            ? response()->json(["data" => VehiculeResource::collection($vehicules)], 200)
-            : response()->json(["vehicules" => []], 404);
+        
+        return response()->json(["data" => VehiculeResource::collection($vehicules)], 200);
     }
+    
     
     /**
      * Store a newly created resource in storage.
@@ -32,35 +31,25 @@ class VehiculeController extends Controller
      * @return \Illuminate\Http\Response
      */
     //----------------------------------AddVehicule----------------------
-    public function store(Request $request)
-{
-    // Validation rules
-    $validator = Validator::make($request->all(), [
-        'modele' => 'required|integer',
-        'matricule' => 'required|unique:vehicules|string',
-        'marque' => 'required|string',
-        'couleur' => 'required|string',
-        'autoEcole_id' => 'required|integer',
-        'permis_id' => 'required|integer',
-    ]);
+    public function store(Request $request): JsonResponse
+    {
+        $request->validate([
+            'modele' => 'required|integer',
+            'matricule' => 'required|unique:vehicules|string',
+            'marque' => 'required|string',
+            'couleur' => 'required|string',
+            'autoEcole_id' => 'required|integer',
+            'permis_id' => 'required|integer',
+        ]);
 
-    if ($validator->fails()) {
-        return response()->json(['error' => $validator->errors()], 422);//422: for input errors
+        $vehicule = Vehicule::create($request->all());
+
+        if ($vehicule) {
+            return response()->json(['message' => 'Vehicule added successfully', 'data' => ['id' => $vehicule->id]], 201);
+        } else {
+            return response()->json(['error' => 'Failed to create vehicule'], 422);
+        }
     }
-    $vehicule = Vehicule::create([
-        'modele' => $request->modele,
-        'matricule' => $request->matricule,
-        'marque' => $request->marque,
-        'couleur' => $request->couleur,
-        'autoEcole_id' => $request->autoEcole_id,
-        'permis_id' => $request->permis_id,
-    ]);
-    if ($vehicule) {
-        return response()->json(['message' => 'Vehicule added successfully', 'data' => $vehicule], 201);//return just vehicule id
-    } else {
-        return response()->json(['error' => 'Failed to create vehicule'], 500);
-    }
-}
 
     /**
      * Display the specified resource.
