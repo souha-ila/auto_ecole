@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\VehiculeResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\VehiculeCollection;
-
 class VehiculeController extends Controller
 {
     
@@ -113,7 +112,7 @@ class VehiculeController extends Controller
             $vehicule = Vehicule::find($id);
             
             if (!$vehicule) {
-                return response()->json(['status' => 'error', 'message' => 'Not found'], 404);
+                return response()->json(['message' => 'Not found'], 404);
             }
 
             $vehicule->delete();
