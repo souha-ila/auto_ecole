@@ -116,7 +116,7 @@ class VehiculeController extends Controller
             }
 
             $vehicule->delete();
-            return response()->json(['status' => 'success', 'message' => 'Vehicule deleted successfully'], 200);
+            return response()->json(['message' => 'Vehicule deleted successfully'], 200);
 
         } catch (\Throwable $th)
         {
