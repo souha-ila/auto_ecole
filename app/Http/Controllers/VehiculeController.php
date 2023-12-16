@@ -2,23 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\Helper;
 use App\Models\Vehicule;
 use Illuminate\Http\Request;
+use App\Filters\VehiculesFilter;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\VehiculeResource;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\VehiculeCollection;
+
 class VehiculeController extends Controller
+
 {
     
-    public function index()
+    public function index(Request $request)
     {
-        try
-        {
-            return new VehiculeCollection(Vehicule::all());
-        } catch (\Throwable $th)
-        {
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
+        try{
+
+            $filter = new VehiculesFilter();
+            $filterItems = $filter->transform($request);
+            $vehicules = Vehicule::Where($filterItems)->get();
+            return new VehiculeCollection($vehicules);
+            
+        } catch (\Throwable $th) {
+            return Helper::handleException($th);
         }
     }
     
@@ -43,8 +50,9 @@ class VehiculeController extends Controller
             return response()->json(["data" => ["message" => "Vehicule created with success", "id" => $vehicule->id]], 201);
         } catch (\Throwable $th)
         {
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
-        }
+            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
+            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
+         }
     }
 //------------------------show vehicule by ID----------------
     public function show($id)
@@ -63,7 +71,8 @@ class VehiculeController extends Controller
 
         } catch (\Throwable $th)
         {
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
+            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
+            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
         }
     }
     
@@ -101,7 +110,8 @@ class VehiculeController extends Controller
         
         }catch (\Throwable $th)
             {
-               return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
+                $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
+                return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
             }
    }
     
@@ -120,7 +130,8 @@ class VehiculeController extends Controller
 
         } catch (\Throwable $th)
         {
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
+            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
+            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
         }
     }
 
@@ -138,7 +149,8 @@ public function vehiculesByAutoEcole($autoEcoleId)
 
     } catch (\Throwable $th)
     {  
-        return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());   
+        $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
+        return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode); 
     }
 }
 
