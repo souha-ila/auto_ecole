@@ -48,11 +48,9 @@ class VehiculeController extends Controller
         {
             $vehicule = Vehicule::create($validator->validate());
             return response()->json(["data" => ["message" => "Vehicule created with success", "id" => $vehicule->id]], 201);
-        } catch (\Throwable $th)
-        {
-            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
-         }
+        } catch (\Throwable $th) {
+            return Helper::handleException($th);
+        }
     }
 //------------------------show vehicule by ID----------------
     public function show($id)
@@ -69,10 +67,8 @@ class VehiculeController extends Controller
             //return new Vehicule($vehicule);
             return new VehiculeResource($vehicule);
 
-        } catch (\Throwable $th)
-        {
-            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
+        } catch (\Throwable $th) {
+            return Helper::handleException($th);
         }
     }
     
@@ -109,9 +105,8 @@ class VehiculeController extends Controller
            return response()->json(["data" => ['message' => 'Vehicule updated successfully']], 200);
         
         }catch (\Throwable $th)
-            {
-                $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
-                return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
+            { 
+                return Helper::handleException($th);
             }
    }
     
@@ -129,9 +124,8 @@ class VehiculeController extends Controller
             return response()->json(['message' => 'Vehicule deleted successfully'], 200);
 
         } catch (\Throwable $th)
-        {
-            $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
-            return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode);
+        { 
+            return Helper::handleException($th);
         }
     }
 
@@ -149,8 +143,7 @@ public function vehiculesByAutoEcole($autoEcoleId)
 
     } catch (\Throwable $th)
     {  
-        $statusCode = is_numeric($th->getCode()) ? (int)$th->getCode() : 500;
-        return response()->json(["errors" => ["message" => $th->getMessage()]], $statusCode); 
+        return Helper::handleException($th);
     }
 }
 
@@ -168,7 +161,7 @@ public function vehiculesByPermis($PermisId)
 
     } catch (\Throwable $th)
     {
-        return response()->json(["errors" => ["message" => $th->getMessage()]], $th->getCode() > 500 ? 500 : $th->getCode());
+        return Helper::handleException($th);
     }
 }
 
