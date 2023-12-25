@@ -28,7 +28,7 @@ class VehiculeController extends Controller
             return Helper::handleException($th);
         }
     }
-    
+//------------------------store----------------   
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -64,7 +64,6 @@ class VehiculeController extends Controller
             {
                 return response()->json(['errors' => ["message" => "this vehicule not found"]], 404);
             } 
-            //return new Vehicule($vehicule);
             return new VehiculeResource($vehicule);
 
         } catch (\Throwable $th) {
@@ -128,42 +127,6 @@ class VehiculeController extends Controller
             return Helper::handleException($th);
         }
     }
-
-//-----------------List of vehicules by AutoEcole ID-----------------
-public function vehiculesByAutoEcole($autoEcoleId)
-{
-    try {
-        $vehicules = Vehicule::where('autoEcole_id', $autoEcoleId)->get();
-          
-    if ($vehicules->isEmpty()) 
-    {
-        return response()->json(['message' => 'No vehicules found for AutoEcole ID ' . $autoEcoleId,], 404); 
-    } 
-    return response()->json(['data' => VehiculeResource::collection($vehicules)], 200);    
-
-    } catch (\Throwable $th)
-    {  
-        return Helper::handleException($th);
-    }
-}
-
-//-----------------List of vehicules by PermisId-----------------
-public function vehiculesByPermis($PermisId)
-{
-    try {
-        $vehicules = Vehicule::where('permis_id', $PermisId)->get();
-
-    if ($vehicules->isEmpty())
-    {
-        return response()->json(['message' => 'No vehicules found for AutoEcole ID ' . $PermisId,], 404); 
-    } 
-    return response()->json(['data' => VehiculeResource::collection($vehicules)], 200);
-
-    } catch (\Throwable $th)
-    {
-        return Helper::handleException($th);
-    }
-}
 
 }
 
