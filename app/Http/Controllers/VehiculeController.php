@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Helpers\Helper;
+use App\Helpers\Helper;
 use App\Models\Vehicule;
 use Illuminate\Http\Request;
 use App\Filters\VehiculesFilter;
